@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timer Grid</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        td {
+            padding: 5px;
+            text-align: center;
+        }
+
+        button {
+            width: 60px;
+            height: 30px;
+            font-size: 10px;
+            margin: 2px;
+            background-color: white;
+        }
+
+        .timerDisplay {
+            font-size: 10px;
+        }
+
+        .header {
+            font-weight: bold;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <table>
+        <!-- Create Table Headers for Columns -->
+        <tr>
+            <td class="header"></td>
+            <td class="header">Mongrel</td>
+            <td class="header">Cauda</td>
+            <td class="header">Cockatrice</td>
+            <td class="header">Karion</td>
+            <td class="header">Berderk</td>
+            <td class="header">Penna1</td>
+            <td class="header">Penna2</td>
+            <td class="header">Rota1</td>
+            <td class="header">Rota2</td>
+            <td class="header">Quadra</td>
+            <td class="header">Pluma</td>
+            <td class="header">Manticore</td>
+            <td class="header">Inferno 2nd</td>
+            <td class="header">Minisha</td>
+            <td class="header">Firedog</td>
+            <td class="header">Enthuid</td>
+        </tr>
+        
+        <!-- Create Table Rows for Channels -->
+        <script>
+            const channelNames = [
+                "Channel1", "Channel2", "Channel3", "Channel4", "Channel5", "Channel6", "Channel7", "Channel8", "Channel9", "Channel10",
+                "Channel11", "Channel12", "Channel13", "Channel14", "Channel15", "Channel16", "Channel17", "Channel18", "Channel19", "Channel20",
+                "Channel21", "Channel22", "Channel23", "Channel24", "Channel25"
+            ];
+            const timerData = {}; // Store the timer states for each button
+            
+            function toggleTimer(id) {
+                const button = document.getElementById("btn" + id);
+                let state = timerData[id];
+            
+                if (!state || state.color === "yellow") {
+                    // If no state or the button is yellow, reset it to ground state
+                    resetTimer(id, button);
+                } else {
+                    // Start the timer again from 240 minutes
+                    startTimer(id, button);
+                }
+            }
+            
+            // Start the timer for the given button id
+            function startTimer(id, button) {
+                let timeLeft = 14400; // Timer starts at 240 minutes (14400 seconds)
+                let lastUpdateTime = Date.now();
+                
+                // Change color and display text when the timer starts
+                button.style.backgroundColor = "green";
+                button.innerHTML = formatTime(timeLeft);
+                timerData[id] = { color: "green", timeLeft: timeLeft };
+            
+                // Update timer every second
+                function updateTimer() {
+                    let now = Date.now();
+                    let deltaTime = (now - lastUpdateTime) / 1000; // Elapsed time in seconds
+                    lastUpdateTime = now;
+            
+                    timeLeft -= deltaTime;
+                    timerData[id].timeLeft = timeLeft;
+            
+                    if (timeLeft <= 0) {
+                        timeLeft = 0;
+                        button.style.backgroundColor = "yellow";
+                        button.innerHTML = "0:00";
+                        timerData[id].color = "yellow"; // Mark timer as yellow
+                    } else {
+                        button.innerHTML = formatTime(timeLeft);
+                    }
+            
+                    // If it's not yellow, keep updating
+                    if (timerData[id].color !== "yellow") {
+                        requestAnimationFrame(updateTimer);
+                    }
+                }
+            
+                updateTimer();
+            }
+            
+            // Reset the timer to 240 minutes and ground state if clicked while yellow
+            function resetTimer(id, button) {
+                let timeLeft = 14400; // Reset to 240 minutes
+                button.style.backgroundColor = "white";  // Reset color to white
+                button.innerHTML = "240:00";  // Reset display to 240:00
+                timerData[id] = { color: "white", timeLeft: timeLeft }; // Reset timer state to ground state
+            }
+            
+            // Helper function to format time in mm:ss
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const sec = Math.floor(seconds % 60);
+                return `${minutes}:${sec < 10 ? "0" + sec : sec}`;
+            }
+
+            // Generate table rows dynamically
+            window.onload = function() {
+                const table = document.querySelector("table");
+                for (let i = 0; i < channelNames.length; i++) {
+                    const row = document.createElement("tr");
+                    const channelCell = document.createElement("td");
+                    channelCell.className = "header";
+                    channelCell.textContent = channelNames[i];
+                    row.appendChild(channelCell);
+
+                    // Create 16 buttons for each channel
+                    for (let j = 1; j <= 16; j++) {
+                        const buttonCell = document.createElement("td");
+                        const button = document.createElement("button");
+                        button.id = `btn${i * 16 + j}`; // Unique ID for each button
+                        button.textContent = "240:00";
+                        button.onclick = function() {
+                            toggleTimer(i * 16 + j);
+                        };
+                        buttonCell.appendChild(button);
+                        row.appendChild(buttonCell);
+                    }
+
+                    table.appendChild(row);
+                }
+            };
+        </script>
+
+</body>
+</html>
